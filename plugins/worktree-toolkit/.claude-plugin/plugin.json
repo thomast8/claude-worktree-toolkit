@@ -1,0 +1,8 @@
+{
+  "name": "worktree-toolkit",
+  "version": "1.0.0",
+  "description": "Create git worktrees from PR numbers / branch names / a live picker (your open PRs and PRs needing your review), and reclaim worktree branches back into main. Graphite-aware. Bundles WorktreeCreate/WorktreeRemove hooks so the session's project directory follows the worktree.",
+  "author": {
+    "name": "Thomas Tiotto"
+  }
+}

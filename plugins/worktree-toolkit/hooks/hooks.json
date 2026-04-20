@@ -1,0 +1,25 @@
+{
+  "description": "WorktreeCreate/WorktreeRemove hooks for worktree-toolkit. WorktreeCreate enforces <type>/<slug> branch naming, checks out existing branches instead of silently creating new ones, and cuts new branches from origin/<default>. WorktreeRemove is an info-only logger.",
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/worktree-create.sh"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/worktree-remove.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

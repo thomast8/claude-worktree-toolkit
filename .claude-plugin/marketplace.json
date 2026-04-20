@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-worktree-toolkit",
+  "version": "1.0.0",
+  "description": "Graphite-aware worktree management for Claude Code: /worktree, /unworktree, and the hooks that make EnterWorktree actually move the session.",
+  "owner": {
+    "name": "Thomas Tiotto"
+  },
+  "plugins": [
+    {
+      "name": "worktree-toolkit",
+      "description": "Create git worktrees from PR numbers or branch names with a live picker, reclaim worktree branches back into main, and auto-copy gitignored dev files. Uses the native EnterWorktree/ExitWorktree tools via bundled WorktreeCreate/WorktreeRemove hooks so the session's project directory follows the worktree.",
+      "source": "./plugins/worktree-toolkit",
+      "category": "productivity"
+    }
+  ]
+}
