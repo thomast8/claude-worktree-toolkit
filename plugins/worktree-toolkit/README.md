@@ -2,6 +2,8 @@
 
 `/worktree` and `/unworktree` for Claude Code, with the hooks that make `EnterWorktree` actually move the session.
 
+> **New here?** Start with the [user guide](./USER_GUIDE.md) — it walks through six realistic scenarios with the exact commands you'd type.
+
 ## Commands
 
 ### `/worktree [arg]`

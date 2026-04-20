@@ -47,4 +47,4 @@ Uninstalling the plugin removes its hooks — nothing lingers in your `settings.
 
 ## License
 
-None specified. Internal sharing only.
+MIT. See [LICENSE](./LICENSE). Use it freely, modify it freely, no warranty.
