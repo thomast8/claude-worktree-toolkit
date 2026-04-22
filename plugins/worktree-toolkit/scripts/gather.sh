@@ -8,6 +8,12 @@
 #     orig_root:       "/abs/path",
 #     is_graphite:     0|1,
 #     resolved_branch: "branch-name" | null,
+#     existing_worktree_path: "/abs/path" | null,  # present when resolved_branch
+#                                                  # is already checked out in a
+#                                                  # registered worktree; the skill
+#                                                  # short-circuits on this so we
+#                                                  # don't EnterWorktree or dance
+#                                                  # through execute.sh needlessly
 #     fetch_warn:      "message" | null,
 #     picker: {
 #       needs_review: [ {number,title,branch,updated_rel,author,review,ci,in_stack}, ... ],
@@ -53,17 +59,42 @@ if [ -n "$ARG" ]; then
   fi
 fi
 
-# If we resolved directly, emit minimal JSON and stop.
+# If we resolved directly, check whether the branch is already checked out
+# anywhere and emit minimal JSON.
+#
+# The `worktree list --porcelain` output is records separated by blank lines:
+#
+#     worktree /path/to/dir
+#     HEAD abc123...
+#     branch refs/heads/branch-name
+#     <blank>
+#
+# We scan for a record whose branch matches resolved_branch and capture its
+# path. Empty if no existing worktree for that branch — including the (rare)
+# case where the branch is detached.
+EXISTING_WORKTREE_PATH=""
+if [ -n "$RESOLVED_BRANCH" ]; then
+  EXISTING_WORKTREE_PATH="$(
+    git -C "$ORIG_ROOT" worktree list --porcelain 2>/dev/null \
+      | awk -v br="refs/heads/$RESOLVED_BRANCH" '
+          /^worktree / { path = $2 }
+          /^branch /   { if ($2 == br) { print path; exit } }
+        '
+  )"
+fi
+
 if [ -n "$RESOLVED_BRANCH" ]; then
   jq -n \
     --arg orig_root "$ORIG_ROOT" \
     --argjson is_graphite "$IS_GRAPHITE" \
     --arg resolved_branch "$RESOLVED_BRANCH" \
+    --arg existing_worktree_path "$EXISTING_WORKTREE_PATH" \
     --arg fetch_warn "$FETCH_WARN" \
     '{
       orig_root: $orig_root,
       is_graphite: $is_graphite,
       resolved_branch: $resolved_branch,
+      existing_worktree_path: (if $existing_worktree_path == "" then null else $existing_worktree_path end),
       fetch_warn: (if $fetch_warn == "" then null else $fetch_warn end),
       picker: null
     }'
@@ -194,6 +225,7 @@ jq -n \
     orig_root: $orig_root,
     is_graphite: $is_graphite,
     resolved_branch: null,
+    existing_worktree_path: null,
     fetch_warn: (if $fetch_warn == "" then null else $fetch_warn end),
     auth_hint:  (if $auth_hint  == "" then null else $auth_hint  end),
     picker: $picker

@@ -25,12 +25,21 @@ Parse the JSON. Fields you care about:
 - `orig_root` — absolute path to the repo toplevel (needed for `execute.sh`)
 - `is_graphite` — 0 or 1
 - `resolved_branch` — set if the user passed an arg; null otherwise
+- `existing_worktree_path` — set if `resolved_branch` is already checked out in a registered worktree; null otherwise
 - `fetch_warn` — surface to the user if non-null ("fetch failed, continuing with stale local data")
 - `auth_hint` — surface to the user if non-null (possible `gh` auth account mismatch)
 - `picker.needs_review` — array of PR rows (only when `resolved_branch` is null)
 - `picker.mine` — array of PR rows (only when `resolved_branch` is null)
 
 If `gather.sh` exits non-zero or the JSON contains `error`, stop and report the error to the user.
+
+**Early exit: existing worktree.** If `existing_worktree_path` is non-null, the branch is already checked out somewhere. Do not ask the mode question, do not call `EnterWorktree`, do not run `execute.sh`. Just tell the user:
+
+> `<branch>` is already checked out at `<existing_worktree_path>`. Run `cd <existing_worktree_path>` in your terminal to work on it.
+
+Also surface `fetch_warn` / `auth_hint` if non-null. Then stop. The user does the `cd` themselves; the skill is finished.
+
+This is the fast path for `/worktree <branch>` where the worktree already exists — skipping all mutation avoids the `EnterWorktree`-refuses-to-nest and `execute.sh`-can't-add-already-checked-out-branch mess we otherwise hit.
 
 ### 2. Resolve target branch
 
